@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import Papa from 'papaparse'
 
-// ▼▼▼ ここにスプレッドシートの「Webに公開」→「CSV」のURLを貼り付けてください ▼▼▼
-// まだ設定されていない場合は、自動的にデモデータが表示されます。
+// Google Sheets CSV URL Configuration
+// スプレッドシートの「ファイル」→「ウェブに公開」→「CSV」のURLをここに設定
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSsvnJe7gSPOFne7gPM0z0ZgmwDUqcIalAelzCH20SWAMQsByiP0sblxzGdValDrybH-abNz2TH-9A7/pub?output=csv'
-// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-// デモデータ (スプレッドシートが読み込めない場合に表示)
+// Demo data (fallback when Google Sheets is unavailable)
 const DEMO_DATA = [
     {
         id: "1",
@@ -62,12 +61,12 @@ export function useBookData() {
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                // URLが設定されていない、またはプレースホルダーの場合はデモデータを使用
-                if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes('docs.google.com') === false) {
-                    console.log("Valid Google Sheet URL not found, using demo data.");
-                    setBooks(DEMO_DATA);
-                    setLoading(false);
-                    return;
+                // Validate Google Sheets URL
+                if (!GOOGLE_SHEET_CSV_URL || !GOOGLE_SHEET_CSV_URL.includes('docs.google.com')) {
+                    console.warn("Valid Google Sheet URL not found, using demo data.")
+                    setBooks(DEMO_DATA)
+                    setLoading(false)
+                    return
                 }
 
                 const response = await fetch(GOOGLE_SHEET_CSV_URL)
@@ -76,18 +75,11 @@ export function useBookData() {
                 }
 
                 const csvText = await response.text()
-                console.log("CSV Fetched (first 100 chars):", csvText.substring(0, 100))
 
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        console.log("CSV Parsed:", results)
-                        if (results.data.length > 0) {
-                            console.log("First row keys:", Object.keys(results.data[0]))
-                        }
-
-                        // CSVのカラム名をアプリのプロパティにマッピング
                         const formattedBooks = results.data.map((item, index) => ({
                             id: item.id || `row-${index}`,
                             title: item.title,
@@ -98,16 +90,15 @@ export function useBookData() {
                             coverUrl: item.cover_url,
                             pdfUrl: item.pdf_url,
                             publishDate: item.publish_date
-                        })).filter(book => book.title);
+                        })).filter(book => book.title)
 
-                        console.log("Formatted Books:", formattedBooks)
                         setBooks(formattedBooks)
                         setLoading(false)
                     },
                     error: (err) => {
                         console.error("CSV Parse Error:", err)
                         setBooks(DEMO_DATA)
-                        setError(err) // Enable error state
+                        setError(err)
                         setLoading(false)
                     }
                 })
@@ -115,7 +106,7 @@ export function useBookData() {
             } catch (err) {
                 console.error("Fetch Error:", err)
                 setBooks(DEMO_DATA)
-                setError(err) // Enable error state
+                setError(err)
                 setLoading(false)
             }
         }
