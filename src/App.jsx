@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Login } from './components/Auth/Login'
-import { BookGrid } from './components/Books/BookGrid'
+import { BookTable } from './components/Books/BookGrid'
 import { BookFilter } from './components/Books/BookFilter'
 import { KanaFilter } from './components/Books/KanaFilter'
 import { AuthorList } from './components/Books/AuthorList'
 import { QuickLook } from './components/Books/QuickLook'
+import { Pagination } from './components/Books/Pagination'
 import { useBookData } from './hooks/useBookData'
 import { KANA_MAP } from './lib/constants'
-import { AnimatePresence } from 'framer-motion'
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -17,6 +17,8 @@ function App() {
     const [selectedKana, setSelectedKana] = useState('all')
     const [selectedAuthor, setSelectedAuthor] = useState(null)
     const [selectedBook, setSelectedBook] = useState(null)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [itemsPerPage, setItemsPerPage] = useState(20)
 
     const { books, loading: dataLoading, error } = useBookData()
 
@@ -101,6 +103,22 @@ function App() {
         return result
     }, [books, searchQuery, sortBy, selectedKana, selectedAuthor])
 
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [searchQuery, sortBy, selectedKana, selectedAuthor])
+
+    // Paginated books
+    const paginatedBooks = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage
+        return filteredBooks.slice(start, start + itemsPerPage)
+    }, [filteredBooks, currentPage, itemsPerPage])
+
+    const handleItemsPerPageChange = (newSize) => {
+        setItemsPerPage(newSize)
+        setCurrentPage(1)
+    }
+
     if (appLoading) return null
 
     if (!isAuthenticated) {
@@ -143,7 +161,7 @@ function App() {
                     activeRow={selectedKana}
                     onSelectRow={(row) => {
                         setSelectedKana(row)
-                        setSelectedAuthor(null) // Reset author when changing kana row
+                        setSelectedAuthor(null)
                     }}
                 />
 
@@ -167,21 +185,28 @@ function App() {
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     </div>
                 ) : (
-                    <BookGrid
-                        books={filteredBooks}
-                        onQuickLook={(book) => setSelectedBook(book)}
-                    />
+                    <>
+                        <BookTable
+                            books={paginatedBooks}
+                            onQuickLook={(book) => setSelectedBook(book)}
+                        />
+                        <Pagination
+                            currentPage={currentPage}
+                            totalItems={filteredBooks.length}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setCurrentPage}
+                            onItemsPerPageChange={handleItemsPerPageChange}
+                        />
+                    </>
                 )}
             </main>
 
-            <AnimatePresence>
-                {selectedBook && (
-                    <QuickLook
-                        book={selectedBook}
-                        onClose={() => setSelectedBook(null)}
-                    />
-                )}
-            </AnimatePresence>
+            {selectedBook && (
+                <QuickLook
+                    book={selectedBook}
+                    onClose={() => setSelectedBook(null)}
+                />
+            )}
         </div>
     )
 }

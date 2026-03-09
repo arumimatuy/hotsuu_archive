@@ -1,57 +1,10 @@
 import { useState, useEffect } from 'react'
 import Papa from 'papaparse'
+import { DEMO_DATA } from '../lib/demoData'
 
 // Google Sheets CSV URL Configuration
 // スプレッドシートの「ファイル」→「ウェブに公開」→「CSV」のURLをここに設定
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSsvnJe7gSPOFne7gPM0z0ZgmwDUqcIalAelzCH20SWAMQsByiP0sblxzGdValDrybH-abNz2TH-9A7/pub?output=csv'
-
-// Demo data (fallback when Google Sheets is unavailable)
-const DEMO_DATA = [
-    {
-        id: "1",
-        title: "Clean Code",
-        author: "Robert C. Martin",
-        author_kana: "ろばーと",
-        category: "Technology",
-        coverUrl: "https://via.placeholder.com/400x600/e2e8f0/1e293b?text=Clean+Code",
-        pdfUrl: "#",
-        description: "Even bad code can function. But if code isn't clean, it can bring a development organization to its knees.",
-        publishDate: "2008-08-01"
-    },
-    {
-        id: "2",
-        title: "The Good Parts",
-        author: "Douglas Crockford",
-        author_kana: "だぐらす",
-        category: "Programming",
-        coverUrl: "https://via.placeholder.com/400x600/fef3c7/92400e?text=JS+Good+Parts",
-        pdfUrl: "#",
-        description: "Most programming languages contain good and bad parts, but JavaScript has more than its share of the bad.",
-        publishDate: "2008-05-01"
-    },
-    {
-        id: "3",
-        title: "デザイン詳細",
-        author: "秋葉 ちひろ",
-        author_kana: "あきば",
-        category: "Design",
-        coverUrl: "https://via.placeholder.com/400x600/fce7f3/9d174d?text=Design",
-        pdfUrl: "#",
-        description: "日本語の本のテスト。",
-        publishDate: "2023-01-01"
-    },
-    {
-        id: "4",
-        title: "Refactoring UI",
-        author: "Adam Wathan",
-        author_kana: "あだむ",
-        category: "Design",
-        coverUrl: "https://via.placeholder.com/400x600/e0f2fe/0369a1?text=Refactoring+UI",
-        pdfUrl: "#",
-        description: "Learn how to design beautiful user interfaces by yourself.",
-        publishDate: "2018-12-11"
-    }
-]
 
 export function useBookData() {
     const [books, setBooks] = useState([])
@@ -80,19 +33,20 @@ export function useBookData() {
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        const formattedBooks = results.data.map((item, index) => ({
-                            id: item.id || `row-${index}`,
+                        const csvBooks = results.data.map((item, index) => ({
+                            id: item.id || `csv-${index}`,
                             title: item.title,
                             author: item.author,
                             author_kana: item.author_kana,
                             description: item.description,
                             category: item.category,
-                            coverUrl: item.cover_url,
                             pdfUrl: item.pdf_url,
                             publishDate: item.publish_date
                         })).filter(book => book.title)
 
-                        setBooks(formattedBooks)
+                        // Merge CSV data with demo data for sufficient testing volume
+                        const mergedBooks = [...csvBooks, ...DEMO_DATA]
+                        setBooks(mergedBooks)
                         setLoading(false)
                     },
                     error: (err) => {

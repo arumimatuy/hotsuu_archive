@@ -1,64 +1,45 @@
-import { motion } from 'framer-motion'
-import { FileText, Calendar, User } from 'lucide-react'
-import { Button } from '../UI/Button'
+import { FileText, Calendar, User, Eye } from 'lucide-react'
 
-export function BookCard({ book, onQuickLook }) {
+export function BookRow({ book, onQuickLook }) {
     return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            whileHover={{ y: -5 }}
-            className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col h-full"
+        <tr
+            className="border-b border-gray-100 hover:bg-blue-50/50 transition-colors duration-150 cursor-pointer group"
+            onClick={() => onQuickLook(book)}
         >
-            <div className="relative aspect-[2/3] overflow-hidden bg-gray-100">
-                <img
-                    src={book.coverUrl}
-                    alt={book.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-
-                {/* Hover overlay button */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button
-                        variant="primary"
-                        className="shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
-                        onClick={() => onQuickLook(book)}
-                    >
-                        詳細を見る
-                    </Button>
-                </div>
-            </div>
-
-            <div className="p-4 flex flex-col flex-grow">
-                <div className="mb-2">
-                    <span className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                        {book.category}
-                    </span>
-                </div>
-
-                <h3 className="font-bold text-gray-900 text-lg leading-tight mb-1 line-clamp-2">
+            <td className="px-4 py-3">
+                <div className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1">
                     {book.title}
-                </h3>
-
-                <div className="flex items-center text-gray-500 text-sm mb-4">
-                    <User className="w-4 h-4 mr-1" />
+                </div>
+            </td>
+            <td className="px-4 py-3">
+                <div className="flex items-center text-gray-600 text-sm">
+                    <User className="w-3.5 h-3.5 mr-1.5 text-gray-400 flex-shrink-0" />
                     <span className="truncate">{book.author}</span>
                 </div>
-
-                <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
-                    <div className="flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {book.publishDate}
-                    </div>
-                    <div className="flex items-center">
-                        <FileText className="w-3 h-3 mr-1" />
-                        PDF
-                    </div>
+            </td>
+            <td className="px-4 py-3 hidden md:table-cell">
+                <span className="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
+                    {book.category}
+                </span>
+            </td>
+            <td className="px-4 py-3 hidden sm:table-cell">
+                <div className="flex items-center text-gray-400 text-xs">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {book.publishDate}
                 </div>
-            </div>
-        </motion.div>
+            </td>
+            <td className="px-4 py-3 text-right">
+                <button
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors opacity-0 group-hover:opacity-100"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onQuickLook(book)
+                    }}
+                >
+                    <Eye className="w-3.5 h-3.5" />
+                    詳細
+                </button>
+            </td>
+        </tr>
     )
 }

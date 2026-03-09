@@ -1,15 +1,10 @@
-import { motion } from 'framer-motion'
 import { cn } from '../../lib/utils'
 
 export function AuthorList({ authors, selectedAuthor, onSelectAuthor }) {
     if (authors.length === 0) return null
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-wrap gap-2 justify-center mb-8"
-        >
+        <div className="flex flex-wrap gap-2 justify-center mb-8 animate-fade-in">
             <button
                 onClick={() => onSelectAuthor(null)}
                 className={cn(
@@ -35,6 +30,6 @@ export function AuthorList({ authors, selectedAuthor, onSelectAuthor }) {
                     {author}
                 </button>
             ))}
-        </motion.div>
+        </div>
     )
 }

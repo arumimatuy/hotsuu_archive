@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { cn } from '../../lib/utils'
 
 export function Button({ className, variant = "primary", size = "md", ...props }) {
@@ -16,10 +15,9 @@ export function Button({ className, variant = "primary", size = "md", ...props }
     }
 
     return (
-        <motion.button
-            whileTap={{ scale: 0.98 }}
+        <button
             className={cn(
-                "rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed",
+                "rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]",
                 variants[variant],
                 sizes[size],
                 className
