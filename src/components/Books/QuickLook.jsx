@@ -51,13 +51,41 @@ export function QuickLook({ book, onClose }) {
                         </button>
                         <button
                             className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                            onClick={() => {
-                                const link = document.createElement('a');
-                                link.href = book.pdfUrl;
-                                link.download = book.title || 'download';
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
+                            onClick={async () => {
+                                try {
+                                    // Fetch the file to force download, avoiding browser's default PDF viewer
+                                    const response = await fetch(book.pdfUrl);
+                                    if (!response.ok) throw new Error('Network response was not ok');
+                                    const blob = await response.blob();
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+
+                                    // Extract filename from URL or use book title
+                                    let filename = `${book.title}.pdf`;
+                                    if (book.pdfUrl && book.pdfUrl.includes('/')) {
+                                        const urlParts = book.pdfUrl.split('/');
+                                        const lastPart = document.decodeURIComponent(urlParts[urlParts.length - 1]);
+                                        if (lastPart.endsWith('.pdf')) {
+                                            filename = lastPart;
+                                        }
+                                    }
+
+                                    link.download = filename;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                    console.error('Download failed:', error);
+                                    // Fallback to old method if fetch fails (e.g., CORS issues from other domains)
+                                    const link = document.createElement('a');
+                                    link.href = book.pdfUrl;
+                                    link.download = `${book.title}.pdf`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                }
                             }}
                         >
                             <Download className="w-5 h-5" />
