@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import Papa from 'papaparse'
-import { DEMO_DATA } from '../lib/demoData'
 
 // Google Sheets CSV URL Configuration
 // スプレッドシートの「ファイル」→「ウェブに公開」→「CSV」のURLをここに設定
@@ -16,8 +15,8 @@ export function useBookData() {
             try {
                 // Validate Google Sheets URL
                 if (!GOOGLE_SHEET_CSV_URL || !GOOGLE_SHEET_CSV_URL.includes('docs.google.com')) {
-                    console.warn("Valid Google Sheet URL not found, using demo data.")
-                    setBooks(DEMO_DATA)
+                    console.warn("Valid Google Sheet URL not found, returning empty state.")
+                    setBooks([])
                     setLoading(false)
                     return
                 }
@@ -44,14 +43,13 @@ export function useBookData() {
                             publishDate: item.publish_date
                         })).filter(book => book.title)
 
-                        // Merge CSV data with demo data for sufficient testing volume
-                        const mergedBooks = [...csvBooks, ...DEMO_DATA]
-                        setBooks(mergedBooks)
+                        // Set the CSV books directly
+                        setBooks(csvBooks)
                         setLoading(false)
                     },
                     error: (err) => {
                         console.error("CSV Parse Error:", err)
-                        setBooks(DEMO_DATA)
+                        setBooks([])
                         setError(err)
                         setLoading(false)
                     }
@@ -59,7 +57,7 @@ export function useBookData() {
 
             } catch (err) {
                 console.error("Fetch Error:", err)
-                setBooks(DEMO_DATA)
+                setBooks([])
                 setError(err)
                 setLoading(false)
             }

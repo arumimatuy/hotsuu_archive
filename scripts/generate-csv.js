@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { execSync } from 'child_process'
 import Papa from 'papaparse'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -99,7 +100,13 @@ async function generateCsv() {
                 const oldPath = path.join(INBOX_DIR, file)
                 const newPath = path.join(PDF_DIR, file)
                 fs.renameSync(oldPath, newPath)
-                console.log(`  - 移動完了: ${file}`)
+                // 自動でGitステージに追加する（未追跡のままだとPush漏れになるため）
+                try {
+                    execSync(`git add "${newPath}"`, { stdio: 'ignore' })
+                    console.log(`  - 🚀 移動＆Git登録完了: ${file}`)
+                } catch (e) {
+                    console.error(`  - ⚠️ 移動は完了しましたが、Git登録に失敗しました: ${file}`)
+                }
             }
         }
 
