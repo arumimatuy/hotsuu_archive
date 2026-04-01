@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Configuration
+const INBOX_DIR = path.join(__dirname, '../draft_pdfs')
 const PDF_DIR = path.join(__dirname, '../public/pdfs')
 const OUTPUT_FILE = path.join(__dirname, '../output/books.csv')
 const GITHUB_PAGES_BASE_URL = 'https://arumimatuy.github.io/hotsuu_archive/pdfs/'
@@ -74,6 +75,10 @@ async function generateCsv() {
 
     try {
         // Ensure directories exist
+        if (!fs.existsSync(INBOX_DIR)) {
+            fs.mkdirSync(INBOX_DIR, { recursive: true })
+            console.log(`✓ フォルダ作成: ${INBOX_DIR}`)
+        }
         if (!fs.existsSync(PDF_DIR)) {
             fs.mkdirSync(PDF_DIR, { recursive: true })
             console.log(`✓ フォルダ作成: ${PDF_DIR}`)
@@ -82,6 +87,20 @@ async function generateCsv() {
         const outputDir = path.dirname(OUTPUT_FILE)
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true })
+        }
+
+        // 新規PDFの移動処理 (draft_pdfs -> public/pdfs)
+        const inboxFiles = fs.existsSync(INBOX_DIR) ? fs.readdirSync(INBOX_DIR) : []
+        const draftPdfs = inboxFiles.filter(f => f.toLowerCase().endsWith('.pdf'))
+
+        if (draftPdfs.length > 0) {
+            console.log(`\n📥 ${draftPdfs.length}件の新規PDFを下書きフォルダから公開フォルダへ移動します...`)
+            for (const file of draftPdfs) {
+                const oldPath = path.join(INBOX_DIR, file)
+                const newPath = path.join(PDF_DIR, file)
+                fs.renameSync(oldPath, newPath)
+                console.log(`  - 移動完了: ${file}`)
+            }
         }
 
         // Read PDF files
@@ -110,7 +129,7 @@ async function generateCsv() {
                 author_kana: info.author_kana,
                 category: info.category,
                 cover_url: '', // 空白（使用しないため）
-                pdf_url: `${GITHUB_PAGES_BASE_URL}${encodeURIComponent(filename)}`,
+                pdf_url: `${GITHUB_PAGES_BASE_URL}${filename}`,
                 description: info.description,
                 publish_date: info.publishDate
             }
