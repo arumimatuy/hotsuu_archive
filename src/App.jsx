@@ -146,8 +146,8 @@ function App() {
 
             <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8 text-center sm:text-left">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">書籍一覧</h2>
-                    <p className="text-gray-500">お探しの書籍を検索または著者名フィルターで絞り込めます。</p>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">記事一覧</h2>
+                    <p className="text-gray-500">お探しの記事を検索または著者名フィルターで絞り込めます。</p>
                 </div>
 
                 {error && (
