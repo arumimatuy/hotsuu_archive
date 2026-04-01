@@ -28,7 +28,7 @@ export function Login({ onLogin }) {
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                         <Lock className="w-6 h-6 text-blue-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800">社内図書ライブラリ</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">保育通信ライブラリ</h2>
                     <p className="text-gray-500 text-sm mt-2">パスワードを入力してください</p>
                 </div>
 
