@@ -70,7 +70,7 @@ export function createZip(entries) {
         const cd = new Uint8Array(46 + nameBytes.length)
         const cv = new DataView(cd.buffer)
         cv.setUint32(0, 0x02014b50, true) // 中央ディレクトリの印
-        cv.setUint16(4, 20, true) // 作成した版 2.0
+        cv.setUint16(4, (3 << 8) | 20, true) // 作成元 Unix・版 2.0（作成元が MS-DOS だと macOS の unzip コマンドが名前を CP437 とみなして化ける）
         cv.setUint16(6, 20, true)
         cv.setUint16(8, 0x0800, true)
         cv.setUint16(10, 0, true)
@@ -84,7 +84,7 @@ export function createZip(entries) {
         cv.setUint16(32, 0, true) // コメントなし
         cv.setUint16(34, 0, true)
         cv.setUint16(36, 0, true)
-        cv.setUint32(38, 0, true)
+        cv.setUint32(38, (0o100644 << 16) >>> 0, true) // 通常のファイル・rw-r--r--（作成元 Unix で 0 にすると権限なしで展開される）
         cv.setUint32(42, offset, true) // ローカルヘッダの位置
         cd.set(nameBytes, 46)
 

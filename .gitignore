@@ -26,3 +26,6 @@ dist-ssr
 # ビルドの直前に scripts/build-data.js が作る生成物（git に入れない）
 public/data/catalog.json
 public/zips/
+
+# 取り込みのたびに作る「貼る行」（作業用の出力）
+output/追加行_*.tsv

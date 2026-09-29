@@ -69,7 +69,7 @@ export function useBookData() {
                                     fileName: key,
                                     size: key ? files?.[key]?.size ?? null : null,
                                     // 自前のPDF（ZIPに入れられる）か／サイトに実在するか
-                                    external: !key,
+                                    external: !key && Boolean(rawUrl),
                                     available: key ? (files ? Boolean(files[key]) : true) : Boolean(rawUrl),
                                 }
                             })

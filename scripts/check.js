@@ -7,21 +7,34 @@
 //   ④ id の重複・かなの空欄
 // を並べる。直すのは人（スプレッドシート）・スクリプトは列挙まで。
 
+import { execFileSync } from 'child_process'
 import Papa from 'papaparse'
 import { fileKey, pdfKeyFromUrl } from '../src/lib/pdfPath.js'
 import { SHEET_CSV_URL } from '../src/lib/sheet.js'
-import { loadMeta, listPdfs } from './lib/meta-store.js'
+import { ROOT, loadMeta, listPdfs } from './lib/meta-store.js'
+
+// git に登録済み（コミット済み＋git add 済み）のPDF＝公開（push）したときにサイトに載るもの
+function gitPdfs(args) {
+    const out = execFileSync('git', ['ls-files', '-z', ...args, '--', 'public/pdfs'], { cwd: ROOT }) // Mac では濁点の形を git がそろえて読む（既定の設定のまま）
+    return out
+        .toString('utf8')
+        .split('\0')
+        .filter((p) => p.toLowerCase().endsWith('.pdf'))
+        .map((p) => fileKey(p.split('/').pop()))
+}
 
 async function main() {
     const res = await fetch(SHEET_CSV_URL)
     if (!res.ok) throw new Error(`スプレッドシートを読めませんでした（${res.status}）`)
     const rows = Papa.parse(await res.text(), { header: true, skipEmptyLines: true }).data.filter((r) => r.title)
     const files = new Set(listPdfs().map(fileKey))
+    const tracked = new Set(gitPdfs([]))
+    const untracked = gitPdfs(['--others', '--exclude-standard'])
     const meta = loadMeta()
 
     const broken = rows.filter((r) => {
         const k = pdfKeyFromUrl(r.pdf_url)
-        return k && !files.has(k)
+        return k && !tracked.has(k)
     })
     const inSheet = new Set(rows.map((r) => pdfKeyFromUrl(r.pdf_url)).filter(Boolean))
     const noRow = [...files].filter((k) => !inSheet.has(k))
@@ -37,7 +50,8 @@ async function main() {
         for (const x of list) console.log(`    - ${fmt(x)}`)
     }
     console.log(`シート ${rows.length}行／PDF ${files.size}本`)
-    line('① リンク切れになる行', broken, (r) => `id ${r.id} ${r.title}`)
+    line('① リンク切れになる行（git に無いPDFを指している）', broken, (r) => `id ${r.id} ${r.title}${files.has(pdfKeyFromUrl(r.pdf_url)) ? '（手元にはある＝git add を忘れている）' : ''}`)
+    line('① git に入っていないPDF（公開しても載らない）', untracked)
     line('② シートに行の無いPDF', noRow)
     line('③ 号が読めていないPDF', noIssue)
     console.log(`ℹ️ 号はあるが頁の無いPDF（誌面に頁番号が無い回）: ${noPage.length}`)

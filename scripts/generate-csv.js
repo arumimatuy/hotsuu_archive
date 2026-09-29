@@ -104,6 +104,20 @@ function buildResolver(rows) {
     return { bySeries, resolveAuthor }
 }
 
+// 前回までに出した追加行（output/追加行_*.tsv）に含まれるPDF → そのファイル名
+function earlierEmitted() {
+    const seen = new Map()
+    if (!fs.existsSync(OUTPUT_DIR)) return seen
+    for (const f of fs.readdirSync(OUTPUT_DIR)) {
+        if (!/^追加行_\d{8}\.tsv$/.test(f.normalize('NFC'))) continue
+        for (const line of fs.readFileSync(path.join(OUTPUT_DIR, f), 'utf8').split('\n')) {
+            const k = pdfKeyFromUrl(line.split('\t')[6])
+            if (k) seen.set(k, f.normalize('NFC'))
+        }
+    }
+    return seen
+}
+
 function formatSheetDate(iso) {
     if (!iso) return ''
     const [y, m, d] = iso.split('-').map((x) => parseInt(x, 10))
@@ -145,6 +159,7 @@ async function main() {
     }
 
     const { bySeries, resolveAuthor } = buildResolver(rows)
+    const earlier = earlierEmitted()
     let nextId = Math.max(0, ...rows.map((r) => parseInt(r.id, 10) || 0)) + 1
     const out = []
     const notes = []
@@ -153,7 +168,8 @@ async function main() {
         const info = parsePdfFilename(key)
         const m = meta.files[key] || {}
         const prev = bySeries.get(info.series)
-        const category = prev?.rows[0]?.category || 'その他'
+        const inherited = prev?.rows[0]?.category || ''
+        const category = inherited || 'その他'
         const authors = info.authors.length ? info.authors : ['']
         for (const short of authors) {
             const a = short ? resolveAuthor(short, prev?.rows) : { author: '', kana: '', from: null }
@@ -164,7 +180,7 @@ async function main() {
                 author_kana: a.kana,
                 category,
                 cover_url: '',
-                pdf_url: PDF_REL_DIR + key,
+                pdf_url: PDF_REL_DIR + key.replace(/[%#?]/g, (c) => encodeURIComponent(c)),
                 description: `${key.replace(/\.pdf$/i, '')}のPDFドキュメントです。`,
                 publish_date: formatSheetDate(m.date) || (m.issueYm ? formatSheetDate(`${m.issueYm}-01`) : ''),
             }
@@ -172,7 +188,10 @@ async function main() {
             const flags = []
             if (!a.author) flags.push('著者なし')
             else if (!a.kana) flags.push('かなが空（新しい著者）')
+            if (a.from === 'family' || a.from === 'series') flags.push(`「${short}」を姓だけで「${a.author}」と判断＝要確認`)
             if (!prev) flags.push('新しい連載・単発＝カテゴリは「その他」で仮置き')
+            else if (!inherited) flags.push('前回のカテゴリが空＝「その他」で仮置き')
+            if (earlier.has(key)) flags.push(`前にも出した行（${earlier.get(key)}）＝貼り済みなら二重に貼らない（シートの公開CSVの反映は数分遅れる）`)
             if (!m.issueNo) flags.push('号が読めない')
             notes.push({ row, flags })
         }

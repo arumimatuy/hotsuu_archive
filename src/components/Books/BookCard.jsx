@@ -9,7 +9,7 @@ export function BookRow({ book, onQuickLook, selection }) {
         : book.external
             ? '号まるごとのPDF（別のサーバ）はまとめてダウンロードの対象外です'
             : !book.available
-                ? 'PDFがまだサイトに載っていません'
+                ? (book.pdfUrl ? 'PDFがまだサイトに載っていません' : 'PDFが登録されていません')
                 : ''
 
     return (

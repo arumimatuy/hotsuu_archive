@@ -48,6 +48,7 @@ export function listPdfs() {
 export function refreshMeta({ all = false, only = null } = {}) {
     const meta = loadMeta()
     const report = { read: [], failed: [], skipped: 0, noTool: !hasPdftotext() }
+    const processed = []
     const files = listPdfs()
     const want = only ? new Set(only.map(fileKey)) : null
 
@@ -59,7 +60,9 @@ export function refreshMeta({ all = false, only = null } = {}) {
             report.skipped++
             continue
         }
-        if (cur && !all && !want) {
+        // 仮の行（source が filename／none＝フッターが読めなかった）は毎回読み直す＝pdftotext を後から入れても埋まる
+        const provisional = cur && (cur.source === 'filename' || cur.source === 'none')
+        if (cur && !all && !want && !provisional) {
             report.skipped++
             continue
         }
@@ -75,8 +78,7 @@ export function refreshMeta({ all = false, only = null } = {}) {
         }
         if (m.pagesInferred) entry.pagesInferred = true
         meta.files[key] = entry
-        if (entry.issueNo) report.read.push(key)
-        else report.failed.push(key)
+        processed.push(key)
     }
 
     // フッターの無い回（生成AIヒナリー等）は、同じ年月の他の記事から号数と発行日を引く
@@ -90,6 +92,10 @@ export function refreshMeta({ all = false, only = null } = {}) {
             v.issueNo = byYm.get(v.issueYm).issueNo
             v.date = byYm.get(v.issueYm).date
         }
+    }
+    for (const key of processed) {
+        if (meta.files[key].issueNo) report.read.push(key)
+        else report.failed.push(key)
     }
     saveMeta(meta)
     return report

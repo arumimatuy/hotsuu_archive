@@ -1,0 +1,3 @@
+# PDF・ZIP は中身を文字として扱わない（Windows の改行変換で壊さない）
+*.pdf binary
+*.zip binary

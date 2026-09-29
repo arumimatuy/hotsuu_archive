@@ -14,7 +14,7 @@ import { fileKey } from '../../src/lib/pdfPath.js'
 export function parsePdfFilename(name) {
     let s = fileKey(name).replace(/\.pdf$/i, '')
     // 末尾の版（.02a／03a／.3a／.02a_WCC25）を外す
-    s = s.replace(/\s*\.?\d{1,2}[a-z](_[A-Za-z0-9]+)?$/, '').trim()
+    s = s.replace(/[\s.]*\d{1,2}[a-z](_[A-Za-z0-9]+)?$/, '').trim()
 
     let issueYm = null
     const ym = s.match(/^(20\d{2})(0[1-9]|1[0-2])/)

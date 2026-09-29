@@ -9,7 +9,8 @@ function saveBlob(blob, filename) {
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    // iPhone の Safari は保存の確認が長く出る＝早く消すと保存に失敗する（FileSaver.js は40秒）
+    setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }
 
 function today() {
