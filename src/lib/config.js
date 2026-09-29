@@ -1,4 +1,4 @@
-// PDFの置き場所を、この1ファイルだけで決める（2026-09-08）
+// PDFの置き場所と、一括ダウンロードの表示を、この1ファイルで決める（2026-09-08・9/29 追記）
 //
 // ■ 既定（VITE_PDF_BASE が未設定＝空文字）
 //   PDFはサイトと同じ場所にある前提で、vite.config.js の base の下から引く。
@@ -16,22 +16,39 @@
 //       ※ 移す先には CORS の許可（Access-Control-Allow-Origin）が要る。
 //          ダウンロードボタンが fetch でPDFを取りにいくため。
 //
-// ■ スプレッドシートに残っている絶対URL（http... で始まる行）はそのまま生きる。
-//   新しく足す行だけ相対パスになり、古い行を一括で直す必要はない。
+// ■ スプレッドシートに残っている github.io の絶対URLも、9/29 からは「ファイル名」に直してから
+//   ここの置き場所で組み立て直す（src/lib/pdfPath.js）。＝移管のときに76行を書き換えなくてよい。
+//   園サーバ（号まるごと）など、自前でないURLはそのまま通す。
+//
+// ■ 一括ダウンロード（号ごとのZIP・選んだ記事のZIP）を隠すとき
+//   → 環境変数 VITE_BULK_DOWNLOAD=off（.github/workflows/deploy.yml の Build の1行）。
+//     ボタンが消え、ZIPも作られなくなる。
+import { pdfKeyFromUrl, buildPdfUrl } from './pdfPath'
+
 export const PDF_BASE = import.meta.env?.VITE_PDF_BASE ?? ''
 
+export const BULK_DOWNLOAD = (import.meta.env?.VITE_BULK_DOWNLOAD ?? 'on') !== 'off'
+
+// サイトの base（末尾スラッシュ付き）
+export function siteBase() {
+    const b = import.meta.env?.BASE_URL || '/'
+    return b.endsWith('/') ? b : b + '/'
+}
+
+// サイトと同梱のファイル（data/catalog.json・zips/…）のURL
+export function assetUrl(relPath) {
+    return siteBase() + relPath.replace(/^\/+/, '')
+}
+
 // CSV の pdf_url を、実際に開けるURLへ組み立てる。
-//  - http(s) で始まる行は「絶対URL」とみなしてそのまま通す
-//    ＝スプレッドシートに残っている既存の行を壊さないため（一括で直さなくてよい）
-//  - それ以外は「サイトからの相対パス」とみなし、上の PDF_BASE
-//    （未設定ならサイトの base）の下から引く
-export function resolvePdfUrl(raw) {
+//   files … data/catalog.json の files（ファイル名（合成形）→ 実在するファイル名）。
+//           渡されれば、濁点の文字コードが違う行も実在する名前に引き直す。
+export function resolvePdfUrl(raw, files) {
     if (!raw) return ''
     const value = String(raw).trim()
     if (!value) return ''
-    if (/^https?:\/\//i.test(value)) return value
-
-    const root = PDF_BASE || import.meta.env?.BASE_URL || '/'
-    const base = root.endsWith('/') ? root : root + '/'
-    return base + value.replace(/^\/+/, '')
+    const key = pdfKeyFromUrl(value)
+    if (!key) return value // 自前でない（園サーバの号まるごと等）はそのまま
+    const actual = files?.[key]?.file ?? key
+    return buildPdfUrl(PDF_BASE || siteBase(), actual)
 }

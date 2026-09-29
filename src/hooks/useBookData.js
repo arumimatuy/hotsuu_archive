@@ -1,63 +1,93 @@
 import { useState, useEffect } from 'react'
 import Papa from 'papaparse'
-import { resolvePdfUrl } from '../lib/config'
+import { resolvePdfUrl, assetUrl } from '../lib/config'
+import { pdfKeyFromUrl } from '../lib/pdfPath'
+import { SHEET_CSV_URL } from '../lib/sheet'
 
-// Google Sheets CSV URL Configuration
-// スプレッドシートの「ファイル」→「ウェブに公開」→「CSV」のURLをここに設定
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSsvnJe7gSPOFne7gPM0z0ZgmwDUqcIalAelzCH20SWAMQsByiP0sblxzGdValDrybH-abNz2TH-9A7/pub?output=csv'
+// 記事の一覧＝スプレッドシート（題・著者・かな・カテゴリ）＋ data/catalog.json（号・頁・実在するファイル）
+//   catalog.json はビルドのたびに scripts/build-data.js が作る。読めなくても一覧は出る（号・頁が出ないだけ）。
+
+function toInt(v) {
+    const n = parseInt(String(v ?? '').trim(), 10)
+    return Number.isFinite(n) ? n : null
+}
+
+async function fetchCatalog() {
+    try {
+        const res = await fetch(assetUrl('data/catalog.json'), { cache: 'no-cache' })
+        if (!res.ok) return null
+        return await res.json()
+    } catch {
+        return null
+    }
+}
 
 export function useBookData() {
     const [books, setBooks] = useState([])
+    const [catalog, setCatalog] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                // Validate Google Sheets URL
-                if (!GOOGLE_SHEET_CSV_URL || !GOOGLE_SHEET_CSV_URL.includes('docs.google.com')) {
-                    console.warn("Valid Google Sheet URL not found, returning empty state.")
-                    setBooks([])
-                    setLoading(false)
-                    return
-                }
-
-                const response = await fetch(GOOGLE_SHEET_CSV_URL)
+                const [response, cat] = await Promise.all([fetch(SHEET_CSV_URL), fetchCatalog()])
                 if (!response.ok) {
                     throw new Error(`Failed to fetch CSV: ${response.statusText}`)
                 }
-
                 const csvText = await response.text()
+                const files = cat?.files || null
+                const external = cat?.external || {}
 
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        const csvBooks = results.data.map((item, index) => ({
-                            id: item.id || `csv-${index}`,
-                            title: item.title,
-                            author: item.author,
-                            author_kana: item.author_kana,
-                            description: item.description,
-                            category: item.category,
-                            pdfUrl: resolvePdfUrl(item.pdf_url),
-                            publishDate: item.publish_date
-                        })).filter(book => book.title)
+                        const csvBooks = results.data
+                            .map((item, index) => {
+                                const key = pdfKeyFromUrl(item.pdf_url)
+                                const rawUrl = String(item.pdf_url || '').trim()
+                                const m = key ? files?.[key] : external[rawUrl]
+                                return {
+                                    rowKey: `r${index}`,
+                                    id: item.id || `csv-${index}`,
+                                    title: item.title,
+                                    author: item.author,
+                                    author_kana: item.author_kana,
+                                    description: item.description,
+                                    category: item.category,
+                                    pdfUrl: resolvePdfUrl(item.pdf_url, files),
+                                    // 発行日＝誌面のフッターの値を優先（シートの publish_date は取り込み日のことがある）
+                                    publishDate: m?.date || item.publish_date,
+                                    // シートに列を足した場合はそちらを優先（無ければ PDF から読んだ値）
+                                    issueYm: item.issue_ym || m?.issueYm || null,
+                                    issueNo: toInt(item.issue_no) ?? m?.issueNo ?? null,
+                                    pageStart: toInt(item.page_start) ?? m?.pageStart ?? null,
+                                    pageEnd: toInt(item.page_end) ?? m?.pageEnd ?? null,
+                                    // 複数著者で同じPDFを指す行は、同じ記事として束ねる鍵
+                                    articleKey: key || rawUrl,
+                                    fileName: key,
+                                    size: key ? files?.[key]?.size ?? null : null,
+                                    // 自前のPDF（ZIPに入れられる）か／サイトに実在するか
+                                    external: !key,
+                                    available: key ? (files ? Boolean(files[key]) : true) : Boolean(rawUrl),
+                                }
+                            })
+                            .filter((book) => book.title)
 
-                        // Set the CSV books directly
+                        setCatalog(cat)
                         setBooks(csvBooks)
                         setLoading(false)
                     },
                     error: (err) => {
-                        console.error("CSV Parse Error:", err)
+                        console.error('CSV Parse Error:', err)
                         setBooks([])
                         setError(err)
                         setLoading(false)
-                    }
+                    },
                 })
-
             } catch (err) {
-                console.error("Fetch Error:", err)
+                console.error('Fetch Error:', err)
                 setBooks([])
                 setError(err)
                 setLoading(false)
@@ -67,5 +97,5 @@ export function useBookData() {
         fetchBooks()
     }, [])
 
-    return { books, loading, error }
+    return { books, catalog, loading, error }
 }

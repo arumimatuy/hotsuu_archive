@@ -1,167 +1,205 @@
+// 毎月の取り込み（2026-09-29 に作り直し）
+//
+//   使い方:  draft_pdfs/ に記事PDFを入れて  node scripts/generate-csv.js
+//
+// やること
+//   1. draft_pdfs/ のPDFを public/pdfs/ へ移す（ファイル名は濁点の文字コードを合成形にそろえる）＋ git add
+//   2. 誌面のフッターから号・頁を読んで data/pdf-meta.json に足す＋ git add
+//   3. 公開スプレッドシートを読みに行き、まだ行の無いPDFについて「貼るだけの行」を作る
+//        → output/追加行_YYYYMMDD.tsv（見出しなし・タブ区切り＝スプレッドシートの空き行の A 列に貼る）
+//      著者・かな・カテゴリは、同じ連載の直近の行・同じ著者の行から引き継ぐ（推測では埋めない）。
+//      引き継げなかった欄は空にして、画面に ⚠️ を出す。
+//
+// ⛔ 以前の版はスプレッドシート全体（全行）を書き出していた。全行を貼り直すと、
+//    整えた題・著者・かなが「不明」「あ」に戻るので、新しい行だけを出す形に変えた。
+//
+// 公開（GitHub へ送る）はこのスクリプトではしない。
+
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import Papa from 'papaparse'
+import { fileKey, pdfKeyFromUrl } from '../src/lib/pdfPath.js'
+import { parsePdfFilename } from './lib/filename.js'
+import { ROOT, PDF_DIR, META_FILE, loadMeta, refreshMeta, listPdfs } from './lib/meta-store.js'
+import { SHEET_CSV_URL } from '../src/lib/sheet.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const INBOX_DIR = path.join(ROOT, 'draft_pdfs')
+const OUTPUT_DIR = path.join(ROOT, 'output')
+const PDF_REL_DIR = 'pdfs/' // サイトからの相対パスで書く（移管してもシートを書き換えなくてよい・9/8）
 
-// Configuration
-const INBOX_DIR = path.join(__dirname, '../draft_pdfs')
-const PDF_DIR = path.join(__dirname, '../public/pdfs')
-const OUTPUT_FILE = path.join(__dirname, '../output/books.csv')
-// PDFはサイトからの「相対パス」で書き出す（ドメインをCSVに焼かない）。
-// 置き場所・ドメインの切り替えは src/lib/config.js の PDF_BASE 側に寄せてあるので、
-// 本番移管でURLが変わっても、このCSV／貼り付け先のスプレッドシートは書き換えなくてよい。
-const PDF_REL_DIR = 'pdfs/'
-
-// Category mapping based on keywords in filename
-const CATEGORY_MAP = [
-    { keywords: ['技術', '開発', 'システム', 'プログラミング', 'React', 'Tech'], category: '技術' },
-    { keywords: ['経営', '戦略', 'ビジネス', '起業'], category: '経営' },
-    { keywords: ['デザイン', 'UI', 'UX', 'Figma'], category: 'デザイン' },
-    { keywords: ['法務', '契約', '法律', 'コンプライアンス'], category: '法務' },
-    { keywords: ['マーケティング', '営業', 'Sales', 'Marketing'], category: 'マーケティング' },
-    { keywords: ['人事', 'HR', '採用', '組織'], category: '人事' },
-    { keywords: ['財務', '会計', 'Finance', '経理'], category: '財務' }
-]
-
-// Kana mapping for authors
-function guessKana(authorName) {
-    if (!authorName) return 'あ'
-    // Default to 'あ' if we can't determine it
-    return 'あ'
-}
-
-function extractInfoFromFilename(filename) {
-    // Remove extension
-    const nameWithoutExt = filename.replace(/\.pdf$/i, '')
-
-    // Default values
-    let title = nameWithoutExt
-    let author = '不明'
-    let category = 'その他'
-    let publishDate = new Date().toISOString().split('T')[0]
-
-    // Try to parse format like: "著者名_タイトル_2024-01-01.pdf" or "タイトル_著者名.pdf"
-    const parts = nameWithoutExt.split('_')
-
-    if (parts.length >= 2) {
-        title = parts[0]
-        author = parts[1]
-
-        if (parts.length >= 3 && /^\d{4}-\d{2}-\d{2}$/.test(parts[2])) {
-            publishDate = parts[2]
-        }
-    }
-
-    // Try to determine category from title
-    for (const mapping of CATEGORY_MAP) {
-        if (mapping.keywords.some(kw => title.includes(kw) || nameWithoutExt.includes(kw))) {
-            category = mapping.category
-            break
-        }
-    }
-
-    return {
-        title: title.trim(),
-        author: author.trim(),
-        author_kana: guessKana(author.trim()),
-        category,
-        description: `${title}のPDFドキュメントです。`,
-        publishDate
-    }
-}
-
-async function generateCsv() {
-    console.log('PDFファイルからCSVメタデータを生成します...')
-
+function gitAdd(p) {
     try {
-        // Ensure directories exist
-        if (!fs.existsSync(INBOX_DIR)) {
-            fs.mkdirSync(INBOX_DIR, { recursive: true })
-            console.log(`✓ フォルダ作成: ${INBOX_DIR}`)
-        }
-        if (!fs.existsSync(PDF_DIR)) {
-            fs.mkdirSync(PDF_DIR, { recursive: true })
-            console.log(`✓ フォルダ作成: ${PDF_DIR}`)
-        }
-
-        const outputDir = path.dirname(OUTPUT_FILE)
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true })
-        }
-
-        // 新規PDFの移動処理 (draft_pdfs -> public/pdfs)
-        const inboxFiles = fs.existsSync(INBOX_DIR) ? fs.readdirSync(INBOX_DIR) : []
-        const draftPdfs = inboxFiles.filter(f => f.toLowerCase().endsWith('.pdf'))
-
-        if (draftPdfs.length > 0) {
-            console.log(`\n📥 ${draftPdfs.length}件の新規PDFを下書きフォルダから公開フォルダへ移動します...`)
-            for (const file of draftPdfs) {
-                const oldPath = path.join(INBOX_DIR, file)
-                const newPath = path.join(PDF_DIR, file)
-                fs.renameSync(oldPath, newPath)
-                // 自動でGitステージに追加する（未追跡のままだとPush漏れになるため）
-                try {
-                    execSync(`git add "${newPath}"`, { stdio: 'ignore' })
-                    console.log(`  - 🚀 移動＆Git登録完了: ${file}`)
-                } catch (e) {
-                    console.error(`  - ⚠️ 移動は完了しましたが、Git登録に失敗しました: ${file}`)
-                }
-            }
-        }
-
-        // Read PDF files
-        const files = fs.existsSync(PDF_DIR) ? fs.readdirSync(PDF_DIR) : []
-        const pdfFiles = files.filter(f => f.toLowerCase().endsWith('.pdf'))
-
-        if (pdfFiles.length === 0) {
-            console.warn(`\n⚠️ 警告: ${PDF_DIR} にPDFファイルがありません。`)
-            console.log('テスト用にダミーデータを含むCSVを一時的に生成します。')
-
-            // Generate dummy PDF entries if empty
-            pdfFiles.push('React実践ガイド_山田太郎_2024-01-15.pdf')
-            pdfFiles.push('マーケティング戦略_鈴木花子.pdf')
-            pdfFiles.push('UIデザインの基礎_佐藤一郎_2023-11-20.pdf')
-        }
-
-        console.log(`\n${pdfFiles.length}件のPDFファイルが見つかりました/処理します。`)
-
-        // Process files
-        const records = pdfFiles.map((filename, index) => {
-            const info = extractInfoFromFilename(filename)
-            return {
-                id: `pdf-${index + 1}`,
-                title: info.title,
-                author: info.author,
-                author_kana: info.author_kana,
-                category: info.category,
-                cover_url: '', // 空白（使用しないため）
-                pdf_url: `${PDF_REL_DIR}${filename}`,
-                description: info.description,
-                publish_date: info.publishDate
-            }
-        })
-
-        // Generate CSV and add UTF-8 BOM for Excel compatibility
-        const csv = Papa.unparse(records)
-        const bom = '\uFEFF'
-        fs.writeFileSync(OUTPUT_FILE, bom + csv, 'utf8')
-
-        console.log(`\n✅ 完了: ${OUTPUT_FILE} を生成しました。`)
-        console.log('--------------------------------------------------')
-        console.log('■ スプレッドシートへのインポート方法:')
-        console.log('1. 生成された books.csv をテキストエディタ・Excelで開く')
-        console.log('2. 内容をコピーする。ヘッダー（1行目）を含めるかどうかはスプレッドシートの状況に合わせてください。')
-        console.log('3. 指定のスプレッドシートに貼り付ける')
-        console.log('--------------------------------------------------')
-
-    } catch (error) {
-        console.error('エラーが発生しました:', error)
-        process.exit(1)
+        execFileSync('git', ['add', '--', p], { cwd: ROOT, stdio: 'ignore' })
+        return true
+    } catch {
+        return false
     }
 }
 
-generateCsv()
+function moveDrafts() {
+    fs.mkdirSync(INBOX_DIR, { recursive: true })
+    fs.mkdirSync(PDF_DIR, { recursive: true })
+    const drafts = fs.readdirSync(INBOX_DIR).filter((f) => f.toLowerCase().endsWith('.pdf'))
+    const existing = new Set(listPdfs().map(fileKey))
+    const moved = []
+    for (const f of drafts) {
+        const name = fileKey(f)
+        if (existing.has(name)) {
+            console.log(`  - ⏭ すでにあるので移さない: ${name}`)
+            continue
+        }
+        const to = path.join(PDF_DIR, name)
+        fs.renameSync(path.join(INBOX_DIR, f), to)
+        const ok = gitAdd(path.join('public', 'pdfs', name))
+        console.log(`  - ${ok ? '🚀 移動＆Git登録' : '⚠️ 移動（Git登録に失敗）'}: ${name}`)
+        moved.push(name)
+    }
+    return moved
+}
+
+async function fetchSheetRows() {
+    const res = await fetch(SHEET_CSV_URL)
+    if (!res.ok) throw new Error(`スプレッドシートを読めませんでした（${res.status}）`)
+    const text = await res.text()
+    return Papa.parse(text, { header: true, skipEmptyLines: true }).data
+}
+
+// 同じ連載の直近の行・同じ著者の行から、著者名・かな・カテゴリを引き継ぐ
+function buildResolver(rows) {
+    const bySeries = new Map() // 連載名 → { id, pdf, rows }＝直近の回の行（複数著者なら複数行）
+    const byAuthor = new Map() // 著者名 → かな
+    for (const r of rows) {
+        if (r.author) byAuthor.set(r.author.trim(), (r.author_kana || '').trim())
+        const key = pdfKeyFromUrl(r.pdf_url)
+        if (!key) continue
+        const series = parsePdfFilename(key).series
+        const id = parseInt(r.id, 10) || 0
+        const cur = bySeries.get(series)
+        if (cur && cur.pdf === key) {
+            cur.rows.push(r)
+            cur.id = Math.max(cur.id, id)
+        } else if (!cur || id > cur.id) {
+            bySeries.set(series, { id, pdf: key, rows: [r] })
+        }
+    }
+    const authorNames = [...byAuthor.keys()]
+
+    function resolveAuthor(short, seriesRows) {
+        const s = short.trim()
+        // 1) 同じ名前がそのままある
+        if (byAuthor.has(s)) return { author: s, kana: byAuthor.get(s), from: 'author' }
+        // 2) 姓だけ（「普光院」）→ 姓の一致する著者が1人だけなら
+        const fam = authorNames.filter((a) => a.split(/\s+/)[0] === s)
+        if (fam.length === 1) return { author: fam[0], kana: byAuthor.get(fam[0]), from: 'family' }
+        // 3) 部署名（「調査部」）→ 全私保連◯◯部
+        const org = authorNames.filter((a) => a.startsWith('全私保連') && a.endsWith(s))
+        if (org.length === 1) return { author: org[0], kana: byAuthor.get(org[0]), from: 'org' }
+        // 4) 同じ連載の前回の著者に姓が一致する人
+        const prev = (seriesRows || []).map((r) => r.author).filter((a) => a && a.startsWith(s))
+        if (prev.length === 1) return { author: prev[0], kana: byAuthor.get(prev[0]) || '', from: 'series' }
+        return { author: s, kana: '', from: null }
+    }
+
+    return { bySeries, resolveAuthor }
+}
+
+function formatSheetDate(iso) {
+    if (!iso) return ''
+    const [y, m, d] = iso.split('-').map((x) => parseInt(x, 10))
+    return `${y}/${m}/${d}`
+}
+
+async function main() {
+    console.log('📥 draft_pdfs/ から public/pdfs/ へ移します')
+    const moved = moveDrafts()
+    if (moved.length === 0) console.log('  （新しいPDFはありません）')
+
+    console.log('\n🔎 誌面のフッターから号・頁を読みます')
+    const report = refreshMeta({ only: moved.length ? moved : null })
+    if (report.noTool) console.log('  ⚠️ pdftotext が無いので号・頁は空のまま（brew install poppler で入る）')
+    for (const k of report.failed) console.log(`  - ⚠️ 号・頁が読めない: ${k}`)
+    gitAdd(path.relative(ROOT, META_FILE))
+    const meta = loadMeta()
+
+    console.log('\n📄 公開スプレッドシートと突き合わせます')
+    let rows
+    try {
+        rows = await fetchSheetRows()
+    } catch (e) {
+        console.error(`  ⚠️ ${e.message} → 貼る行は作れませんでした（PDFの移動と号・頁は済んでいます）`)
+        return
+    }
+    const inSheet = new Set(rows.map((r) => pdfKeyFromUrl(r.pdf_url)).filter(Boolean))
+    const missing = listPdfs()
+        .map(fileKey)
+        .filter((k) => !inSheet.has(k))
+        .sort((a, b) => {
+            const ma = meta.files[a] || {}
+            const mb = meta.files[b] || {}
+            return (ma.issueYm || '').localeCompare(mb.issueYm || '') || (ma.pageStart ?? 999) - (mb.pageStart ?? 999)
+        })
+    if (missing.length === 0) {
+        console.log('  ✅ すべてのPDFにスプレッドシートの行があります（貼る行はありません）')
+        return
+    }
+
+    const { bySeries, resolveAuthor } = buildResolver(rows)
+    let nextId = Math.max(0, ...rows.map((r) => parseInt(r.id, 10) || 0)) + 1
+    const out = []
+    const notes = []
+
+    for (const key of missing) {
+        const info = parsePdfFilename(key)
+        const m = meta.files[key] || {}
+        const prev = bySeries.get(info.series)
+        const category = prev?.rows[0]?.category || 'その他'
+        const authors = info.authors.length ? info.authors : ['']
+        for (const short of authors) {
+            const a = short ? resolveAuthor(short, prev?.rows) : { author: '', kana: '', from: null }
+            const row = {
+                id: String(nextId++),
+                title: info.title,
+                author: a.author,
+                author_kana: a.kana,
+                category,
+                cover_url: '',
+                pdf_url: PDF_REL_DIR + key,
+                description: `${key.replace(/\.pdf$/i, '')}のPDFドキュメントです。`,
+                publish_date: formatSheetDate(m.date) || (m.issueYm ? formatSheetDate(`${m.issueYm}-01`) : ''),
+            }
+            out.push(row)
+            const flags = []
+            if (!a.author) flags.push('著者なし')
+            else if (!a.kana) flags.push('かなが空（新しい著者）')
+            if (!prev) flags.push('新しい連載・単発＝カテゴリは「その他」で仮置き')
+            if (!m.issueNo) flags.push('号が読めない')
+            notes.push({ row, flags })
+        }
+    }
+
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true })
+    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    const tsvPath = path.join(OUTPUT_DIR, `追加行_${stamp}.tsv`)
+    const cols = ['id', 'title', 'author', 'author_kana', 'category', 'cover_url', 'pdf_url', 'description', 'publish_date']
+    const tsv = out.map((r) => cols.map((c) => String(r[c] ?? '').replace(/[\t\n]/g, ' ')).join('\t')).join('\n') + '\n'
+    fs.writeFileSync(tsvPath, tsv, 'utf8')
+
+    console.log(`  ➕ スプレッドシートに無いPDF ${missing.length}本 → 貼る行 ${out.length}行`)
+    for (const { row, flags } of notes) {
+        console.log(
+            `    ${row.id}  ${row.title}｜${row.author || '—'}｜${row.author_kana || '（空）'}｜${row.category}` +
+                (flags.length ? `  ⚠️ ${flags.join('・')}` : ''),
+        )
+    }
+    console.log('--------------------------------------------------')
+    console.log(`■ 貼り方: ${path.relative(ROOT, tsvPath)} をテキストエディタで開いて全部コピー`)
+    console.log('  → スプレッドシートの最終行の下、A列のセルを選んで貼り付け（見出し行は入っていません）')
+    console.log('  → ⚠️ の行だけ目で見て直す')
+    console.log('--------------------------------------------------')
+}
+
+main().catch((e) => {
+    console.error('エラーが発生しました:', e)
+    process.exit(1)
+})

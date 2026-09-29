@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ビルドの直前に scripts/build-data.js が作る生成物（git に入れない）
+public/data/catalog.json
+public/zips/

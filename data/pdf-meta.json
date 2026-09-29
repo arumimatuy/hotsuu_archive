@@ -1,0 +1,623 @@
+{
+  "_説明": "誌面PDFの号・頁（フッターから自動で読んだ値）。正本はこのファイル。source=manual の行は自動で上書きしない。題・著者・かなはスプレッドシート側。",
+  "files": {
+    "202603虐待防止・60：杉山氏.03a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 51,
+      "pageEnd": 51,
+      "source": "footer"
+    },
+    "202603経営相談室・24：松本氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 52,
+      "pageEnd": 53,
+      "source": "footer"
+    },
+    "202603子どもの性暴力防止：普光院氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 6,
+      "pageEnd": 10,
+      "source": "footer"
+    },
+    "202603子どもの目の健康・後編：太田氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 4,
+      "pageEnd": 5,
+      "source": "footer"
+    },
+    "202603止まらない虐待・29：森田氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 22,
+      "pageEnd": 27,
+      "source": "footer"
+    },
+    "202603主体性が湧き出ちゃう保育・15：久保氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 28,
+      "pageEnd": 33,
+      "source": "footer"
+    },
+    "202603小学生の声を聴く・35：和田氏.03a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 46,
+      "pageEnd": 47,
+      "source": "footer"
+    },
+    "202603食育実践講座・108：野口氏.03a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 39,
+      "pageEnd": 45,
+      "source": "footer"
+    },
+    "202603心を育てる・129：井桁氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 36,
+      "pageEnd": 38,
+      "source": "footer"
+    },
+    "202603生きもの～・72：小泉氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 34,
+      "pageEnd": 35,
+      "source": "footer"
+    },
+    "202603保育士養成校の現在・６：青山氏.02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 48,
+      "pageEnd": 50,
+      "source": "footer"
+    },
+    "202603保育者座談会・18：02a.pdf": {
+      "issueNo": 852,
+      "issueYm": "2026-03",
+      "date": "2026-03-01",
+      "pageStart": 16,
+      "pageEnd": 21,
+      "source": "footer"
+    },
+    "202604・100市区保育施策：普光院 亜紀氏.02b.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 4,
+      "pageEnd": 8,
+      "source": "footer"
+    },
+    "202604・リレー連載・９：島根県大田市・前編.04a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 36,
+      "pageEnd": 39,
+      "source": "footer"
+    },
+    "202604ジタバタと○○を語ろう・１：久保 健太氏・鈴木 秀弘氏.03a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 12,
+      "pageEnd": 15,
+      "source": "footer"
+    },
+    "202604虐待防止・61：杉山 春氏.02a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 45,
+      "pageEnd": 45,
+      "source": "footer"
+    },
+    "202604経営・労務管理・39：関山 浩司氏.03a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 28,
+      "pageEnd": 33,
+      "source": "footer"
+    },
+    "202604経営相談室・25：松本 和也氏. 02a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 34,
+      "pageEnd": 35,
+      "source": "footer"
+    },
+    "202604小学生の声を聴く・36：和田 秀一氏.05a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 26,
+      "pageEnd": 27,
+      "source": "footer"
+    },
+    "202604食育実践講座・109：野口 孝則氏.02b.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 21,
+      "pageEnd": 25,
+      "source": "footer"
+    },
+    "202604心を育てる・130：井桁 容子氏.02a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 18,
+      "pageEnd": 20,
+      "source": "footer"
+    },
+    "202604生きもの～・73：小泉 昭男氏.03a.pdf": {
+      "issueNo": 853,
+      "issueYm": "2026-04",
+      "date": "2026-04-01",
+      "pageStart": 16,
+      "pageEnd": 17,
+      "source": "footer"
+    },
+    "202605・リレー連載・10：島根県大田市・後編.02a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 28,
+      "pageEnd": 31,
+      "source": "footer"
+    },
+    "202605・今後の幼児教育・保育：無藤 隆氏.02a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 4,
+      "pageEnd": 6,
+      "source": "footer"
+    },
+    "202605シンプルストレッチ講座2nd・１：原田 実樹典氏.03a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 26,
+      "pageEnd": 27,
+      "source": "footer"
+    },
+    "202605虐待防止・62：杉山 春氏.02b.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 21,
+      "pageEnd": 21,
+      "source": "footer"
+    },
+    "202605小学生の声を聴く・37：和田 秀一氏.03a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 22,
+      "pageEnd": 23,
+      "source": "footer"
+    },
+    "202605食育実践講座・110：野口 孝則氏.02a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 12,
+      "pageEnd": 17,
+      "source": "footer"
+    },
+    "202605心を育てる・131：井桁 容子氏.02a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 18,
+      "pageEnd": 20,
+      "source": "footer"
+    },
+    "202605生きもの～・74：小泉 昭男氏.02a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 8,
+      "pageEnd": 9,
+      "source": "footer"
+    },
+    "202605保育施設の音環境・６：川井 敬二氏.02a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 10,
+      "pageEnd": 11,
+      "source": "footer"
+    },
+    "202606・調査部コラム・４：調査部.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 50,
+      "pageEnd": 50,
+      "source": "footer"
+    },
+    "202606・追悼・遠山洋一先生：鈴木 眞廣氏・室田 一樹氏 .02c.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 42,
+      "pageEnd": 44,
+      "source": "footer"
+    },
+    "202606ジタバタと○○を語ろう・２：久保 健太氏・鈴木 秀弘氏.02a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 10,
+      "pageEnd": 13,
+      "source": "footer"
+    },
+    "202606虐待防止・63：杉山 春氏.02a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 45,
+      "pageEnd": 45,
+      "source": "footer"
+    },
+    "202606経営・労務管理・40：関山 浩司氏.03a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 28,
+      "pageEnd": 33,
+      "source": "footer"
+    },
+    "202606経営相談室・27：松本 和也氏.02a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 26,
+      "pageEnd": 27,
+      "source": "footer"
+    },
+    "202606小学生の声を聴く・38：和田 秀一氏.03a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 24,
+      "pageEnd": 25,
+      "source": "footer"
+    },
+    "202606食育実践講座・111：野口 孝則氏.03a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 19,
+      "pageEnd": 23,
+      "source": "footer"
+    },
+    "202606心を育てる・132：井桁 容子氏.02a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 16,
+      "pageEnd": 18,
+      "source": "footer"
+    },
+    "202606生きもの～・75：小泉 昭男氏.02a.pdf": {
+      "issueNo": 855,
+      "issueYm": "2026-06",
+      "date": "2026-06-01",
+      "pageStart": 14,
+      "pageEnd": 15,
+      "source": "footer"
+    },
+    "202607サキドリ！・１：研修部.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 34,
+      "pageEnd": 35,
+      "source": "footer"
+    },
+    "202607シンプルストレッチ講座2nd・２：原田 実樹典氏.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 32,
+      "pageEnd": 33,
+      "source": "footer"
+    },
+    "202607虐待防止・64：杉山 春氏.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 43,
+      "pageEnd": 43,
+      "source": "footer"
+    },
+    "202607経営相談室・28：松本 和也氏.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 30,
+      "pageEnd": 31,
+      "source": "footer"
+    },
+    "202607小学生の声を聴く・39：和田 秀一氏.03a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 28,
+      "pageEnd": 29,
+      "source": "footer"
+    },
+    "202607食育実践講座・112：野口 孝則氏.02b.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 23,
+      "pageEnd": 27,
+      "source": "footer"
+    },
+    "202607心を育てる・133：井桁 容子氏.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 20,
+      "pageEnd": 22,
+      "source": "footer"
+    },
+    "202607生きもの～・76：小泉 昭男氏.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 18,
+      "pageEnd": 19,
+      "source": "footer"
+    },
+    "202607生成AIヒナリー・４：事業部.02a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": null,
+      "pageEnd": null,
+      "source": "filename"
+    },
+    "202607調査部コラム・５：調査部.03a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 46,
+      "pageEnd": 46,
+      "source": "footer"
+    },
+    "202607旅する座談会・１：宮里・久保・島本・山本氏.03a.pdf": {
+      "issueNo": 856,
+      "issueYm": "2026-07",
+      "date": "2026-07-01",
+      "pageStart": 12,
+      "pageEnd": 17,
+      "source": "footer"
+    },
+    "202608・生成AIヒナリー・５：事業部.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": null,
+      "pageEnd": null,
+      "source": "filename"
+    },
+    "202608・調査部コラム・６：調査部.03a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 58,
+      "pageEnd": 58,
+      "source": "footer"
+    },
+    "202608・北九州大会開催報告.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 4,
+      "pageEnd": 8,
+      "source": "footer"
+    },
+    "202608ジタバタと○○を語ろう・３：久保 健太氏・鈴木 秀弘氏.03a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 14,
+      "pageEnd": 17,
+      "source": "footer"
+    },
+    "202608虐待防止・65：杉山 春氏.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 35,
+      "pageEnd": 35,
+      "source": "footer"
+    },
+    "202608経営・労務管理・39：関山 浩司氏.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 30,
+      "pageEnd": 34,
+      "source": "footer"
+    },
+    "202608経営相談室・29：松本 和也氏.02b.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 28,
+      "pageEnd": 29,
+      "source": "footer"
+    },
+    "202608小学生の声を聴く・40：和田 秀一氏.03a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 26,
+      "pageEnd": 27,
+      "source": "footer"
+    },
+    "202608食育実践講座・113：野口 孝則氏.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 21,
+      "pageEnd": 25,
+      "source": "footer"
+    },
+    "202608心を育てる・134：井桁 容子氏.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 18,
+      "pageEnd": 20,
+      "source": "footer"
+    },
+    "202608生きもの～・77：小泉 昭男氏.02a.pdf": {
+      "issueNo": 857,
+      "issueYm": "2026-08",
+      "date": "2026-08-01",
+      "pageStart": 12,
+      "pageEnd": 13,
+      "source": "footer"
+    },
+    "202609・生成AIヒナリー・６：事業部.03a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": null,
+      "pageEnd": null,
+      "source": "filename"
+    },
+    "202609・調査部コラム・７：調査部.3a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 54,
+      "pageEnd": 54,
+      "source": "footer"
+    },
+    "202609サキドリ！・２：研修部.02a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 36,
+      "pageEnd": 37,
+      "source": "footer"
+    },
+    "202609虐待防止・66：杉山 春氏.02a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 39,
+      "pageEnd": 39,
+      "source": "footer"
+    },
+    "202609経営相談室・30：松本 和也氏 .02a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 32,
+      "pageEnd": 33,
+      "source": "footer"
+    },
+    "202609小学生の声を聴く・41：和田 秀一氏.03a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 30,
+      "pageEnd": 31,
+      "source": "footer"
+    },
+    "202609食育実践講座・114：野口 孝則氏.04a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 25,
+      "pageEnd": 29,
+      "source": "footer"
+    },
+    "202609心を育てる・135：井桁 容子氏.03a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 22,
+      "pageEnd": 24,
+      "source": "footer"
+    },
+    "202609生きもの～・78：小泉 昭男氏.02a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 14,
+      "pageEnd": 15,
+      "source": "footer"
+    },
+    "202609旅する座談会・２：宮里・久保・島本・山本・栗原氏03a.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 16,
+      "pageEnd": 21,
+      "source": "footer"
+    },
+    "34-35_HT260919_シンプルストレッチ講座.02a_WCC25.pdf": {
+      "issueNo": 858,
+      "issueYm": "2026-09",
+      "date": "2026-09-01",
+      "pageStart": 34,
+      "pageEnd": 35,
+      "source": "footer"
+    },
+    "経営相談室・26：松本 和也氏.03a.pdf": {
+      "issueNo": 854,
+      "issueYm": "2026-05",
+      "date": "2026-05-01",
+      "pageStart": 24,
+      "pageEnd": 25,
+      "source": "footer"
+    }
+  },
+  "external": {
+    "http://sapporokougakukai.com/files/hotsuu_2026_0101.pdf": {
+      "issueNo": 850,
+      "issueYm": "2026-01",
+      "date": "2026-01-01",
+      "whole": true,
+      "source": "manual",
+      "memo": "号まるごと（園サーバ）。号数はシートの題「保育通信N850」"
+    },
+    "http://sapporokougakukai.com/files/hotsuu_2026_0201.pdf": {
+      "issueNo": 851,
+      "issueYm": "2026-02",
+      "date": "2026-02-01",
+      "whole": true,
+      "source": "manual",
+      "memo": "号まるごと（園サーバ）。号数はシートの題「保育通信N851」"
+    }
+  }
+}

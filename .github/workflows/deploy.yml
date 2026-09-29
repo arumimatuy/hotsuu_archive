@@ -32,6 +32,9 @@ jobs:
       
       - name: Build
         run: npm run build
+        env:
+          # 一括ダウンロード（号ごとのZIP・選んだ記事のZIP）。隠すときは 'off' にする
+          VITE_BULK_DOWNLOAD: 'on'
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -4,10 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/build-data.js",
     "dev": "vite",
+    "prebuild": "node scripts/build-data.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-csv": "node scripts/generate-csv.js",
+    "meta": "node scripts/meta.js",
+    "check": "node scripts/check.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
