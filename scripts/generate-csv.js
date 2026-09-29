@@ -11,7 +11,10 @@ const __dirname = path.dirname(__filename)
 const INBOX_DIR = path.join(__dirname, '../draft_pdfs')
 const PDF_DIR = path.join(__dirname, '../public/pdfs')
 const OUTPUT_FILE = path.join(__dirname, '../output/books.csv')
-const GITHUB_PAGES_BASE_URL = 'https://arumimatuy.github.io/hotsuu_archive/pdfs/'
+// PDFはサイトからの「相対パス」で書き出す（ドメインをCSVに焼かない）。
+// 置き場所・ドメインの切り替えは src/lib/config.js の PDF_BASE 側に寄せてあるので、
+// 本番移管でURLが変わっても、このCSV／貼り付け先のスプレッドシートは書き換えなくてよい。
+const PDF_REL_DIR = 'pdfs/'
 
 // Category mapping based on keywords in filename
 const CATEGORY_MAP = [
@@ -136,7 +139,7 @@ async function generateCsv() {
                 author_kana: info.author_kana,
                 category: info.category,
                 cover_url: '', // 空白（使用しないため）
-                pdf_url: `${GITHUB_PAGES_BASE_URL}${filename}`,
+                pdf_url: `${PDF_REL_DIR}${filename}`,
                 description: info.description,
                 publish_date: info.publishDate
             }

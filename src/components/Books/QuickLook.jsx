@@ -65,7 +65,7 @@ export function QuickLook({ book, onClose }) {
                                     let filename = `${book.title}.pdf`;
                                     if (book.pdfUrl && book.pdfUrl.includes('/')) {
                                         const urlParts = book.pdfUrl.split('/');
-                                        const lastPart = document.decodeURIComponent(urlParts[urlParts.length - 1]);
+                                        const lastPart = decodeURIComponent(urlParts[urlParts.length - 1]);
                                         if (lastPart.endsWith('.pdf')) {
                                             filename = lastPart;
                                         }

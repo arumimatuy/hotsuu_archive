@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Papa from 'papaparse'
+import { resolvePdfUrl } from '../lib/config'
 
 // Google Sheets CSV URL Configuration
 // スプレッドシートの「ファイル」→「ウェブに公開」→「CSV」のURLをここに設定
@@ -39,7 +40,7 @@ export function useBookData() {
                             author_kana: item.author_kana,
                             description: item.description,
                             category: item.category,
-                            pdfUrl: item.pdf_url,
+                            pdfUrl: resolvePdfUrl(item.pdf_url),
                             publishDate: item.publish_date
                         })).filter(book => book.title)
 
